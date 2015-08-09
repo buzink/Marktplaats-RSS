@@ -1,6 +1,6 @@
 // ==UserScript==
 // @name           Marktplaats rss feeds
-// @version        2.5
+// @version        5.0.0.0
 // @namespace      marktplaats
 // @description    Adds rss-feeds to auction site marktplaats.nl
 // @include        http://www.marktplaats.nl/z.html?*
@@ -33,18 +33,16 @@ var validCats = ["0","1","31","91","2600", "48","201","289","1744","322","378","
     if (validCats.indexOf(thisCat[1]) > -1) {
       var rssurl=rssurl.replace("categoryId","g");
     } else {
-        //get id of containing category, but not needed
-		//var catDiv = document.getElementById("search-breadcrumbs-content").querySelector("ul li h2 a");
-        //replace cat ID wth subcat variable name
-        var rssurl=rssurl.replace("categoryId","u");
-        // adding maincat, but not needed: var rssurl=rssurl+"&g="+catDiv.href.match(/c(\d+)\.html/)[1];
-        // before subcat was implemented: var rssurl=rssurl.replace(/categoryId=\d+/g,"g="+catDiv.href.match(/c(\d+)\.html/)[1]);    
+        var rssurl=rssurl.replace("categoryId","u"); 
     }
 }
     
 //add postcode if it is missing    
 	if (rssurl.match(/d=/) && !rssurl.match(/pc=/)) {
-        var rssurl=rssurl+'&pc='+document.getElementById("postcode").value;        
+        var PCele = document.getElementById("postcode");
+        if (PCele) {
+            var rssurl=rssurl+'&pc='+PCele.value;
+        }
     }    
 
 // add url to page
@@ -56,7 +54,7 @@ addRss(rssurl,"search-breadcrumbs-content");
     //create url to rss
     var rssurl="http://www.rss-widget.nl/opensearch.php?ui="+thisSeller[1];
     // add url to page
-    addRss(rssurl,"soi-breadcrumbs-content");
+    addRss(rssurl,"search-breadcrumbs-content");
 }
 
 function addRss(rssurl,rssDiv) {
@@ -65,13 +63,17 @@ function addRss(rssurl,rssDiv) {
 var zNode       = document.createElement('div');
 zNode.innerHTML = '&nbsp;&nbsp;<a href="'+rssurl+'&s=100" target="_blank" ><img src="http://robertbuzink.com/wp-content/themes/varnish/images/subscribe-feed.png"/></a>';
 zNode.setAttribute ('id', 'rssfeed');
+    
+var DIVel = document.getElementById(rssDiv);    
 
-// add link to rss feed to page
-document.getElementById(rssDiv).appendChild(zNode);
-
-//style the link a bit using plain javascript
-document.getElementById('rssfeed').style.paddingTop = '2px';
-document.getElementById('rssfeed').style.float = 'right';
+if (DIVel) {  
+    
+    // add link to rss feed to page
+    DIVel.appendChild(zNode);
+    //style the link a bit using plain javascript
+    document.getElementById('rssfeed').style.paddingTop = '2px';
+    document.getElementById('rssfeed').style.float = 'right';
+}
     
 //add rss link to head section
 var head = document.getElementsByTagName('head')[0]; 
@@ -80,8 +82,7 @@ linktag.type = "application/rss+xml";
 linktag.rel = "alternate"; 
 linktag.title = "RSS"; 
 linktag.href = rssurl; 
-head.appendChild(linktag);     
-    
+head.appendChild(linktag);       
 }    
 
 // koop geen dingen die je niet nodig hebt :)
